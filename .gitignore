@@ -1,0 +1,26 @@
+# Java / Spring Boot
+server/target/
+server/.idea/
+server/*.iml
+
+# Angular / Node
+client/node_modules/
+client/dist/
+client/.angular/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Environment files and secrets
+.env
+.env.*
+!.env.example
+
+# COBOL compiled files
+business/**/*.exe
+business/**/*.dll
+business/**/*.obj
+# Local MongoDB credentials
+server/src/main/resources/application-local.properties
