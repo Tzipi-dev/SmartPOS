@@ -27,4 +27,12 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of("message", "אירעה שגיאה בשרת"));
     }
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, String>> handleBadRequest(
+            IllegalArgumentException exception) {
+
+        return ResponseEntity
+                .badRequest()
+                .body(Map.of("message", exception.getMessage()));
+    }
 }
