@@ -1,3 +1,4 @@
+
 package SmartPOS_Server.models;
 
 import org.springframework.data.annotation.Id;
@@ -14,7 +15,8 @@ public class Product {
 
     private String name;
     private String description;
-    private String category;
+    private String categoryId;
+
     private String metalType;
     private String purity;
     private Double weightGrams;
@@ -32,8 +34,8 @@ public class Product {
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
 
-    public String getCategory() { return category; }
-    public void setCategory(String category) { this.category = category; }
+    public String getCategoryId() { return categoryId; }
+    public void setCategoryId(String categoryId) { this.categoryId = categoryId; }
 
     public String getMetalType() { return metalType; }
     public void setMetalType(String metalType) { this.metalType = metalType; }

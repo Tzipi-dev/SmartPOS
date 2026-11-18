@@ -1,3 +1,4 @@
+
 package SmartPOS_Server.interfaces;
 
 import SmartPOS_Server.dtos.ProductRequestDTO;
@@ -16,4 +17,6 @@ public interface IProductService {
     Product updateProduct(String id, ProductRequestDTO product);
 
     void deleteProduct(String id);
+
+    List<Product> getProductsByCategory(String categoryId);
 }

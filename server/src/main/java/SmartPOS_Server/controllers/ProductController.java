@@ -3,6 +3,7 @@ package SmartPOS_Server.controllers;
 import SmartPOS_Server.dtos.ProductRequestDTO;
 import SmartPOS_Server.interfaces.IProductService;
 import SmartPOS_Server.models.Product;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -44,5 +45,13 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public void deleteProduct(@PathVariable String id) {
         productService.deleteProduct(id);
+    }
+    @GetMapping("/category/{categoryId}")
+    public ResponseEntity<List<Product>> getProductsByCategory(
+            @PathVariable String categoryId) {
+
+        return ResponseEntity.ok(
+                productService.getProductsByCategory(categoryId)
+        );
     }
 }

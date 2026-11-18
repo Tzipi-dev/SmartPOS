@@ -2,7 +2,7 @@ package SmartPOS_Server.interfaces;
 
 import SmartPOS_Server.dtos.CategoryDTO;
 import SmartPOS_Server.models.Category;
-
+import SmartPOS_Server.models.Product;
 import java.util.List;
 
 public interface ICategoryService {
@@ -14,6 +14,7 @@ public interface ICategoryService {
     Category addCategory(CategoryDTO categoryDTO);
 
     Category updateCategory(String id, CategoryDTO categoryDTO);
+
 
     void deleteCategory(String id);
 }

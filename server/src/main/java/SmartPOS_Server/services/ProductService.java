@@ -1,3 +1,4 @@
+
 package SmartPOS_Server.services;
 
 import SmartPOS_Server.dtos.ProductRequestDTO;
@@ -5,6 +6,7 @@ import SmartPOS_Server.exceptions.ResourceNotFoundException;
 import SmartPOS_Server.interfaces.IProductService;
 import SmartPOS_Server.mappers.ProductMapper;
 import SmartPOS_Server.models.Product;
+import SmartPOS_Server.repositories.CategoryRepository;
 import SmartPOS_Server.repositories.ProductRepository;
 import org.springframework.stereotype.Service;
 
@@ -14,13 +16,16 @@ import java.util.List;
 public class ProductService implements IProductService {
 
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
     private final ProductMapper productMapper;
 
     public ProductService(
             ProductRepository productRepository,
+            CategoryRepository categoryRepository,
             ProductMapper productMapper) {
 
         this.productRepository = productRepository;
+        this.categoryRepository = categoryRepository;
         this.productMapper = productMapper;
     }
 
@@ -40,6 +45,8 @@ public class ProductService implements IProductService {
     @Override
     public Product addProduct(ProductRequestDTO productDTO) {
 
+        validateCategory(productDTO.categoryId());
+
         Product product = productMapper.toEntity(productDTO);
 
         return productRepository.save(product);
@@ -49,6 +56,8 @@ public class ProductService implements IProductService {
     public Product updateProduct(String id, ProductRequestDTO productDTO) {
 
         Product existingProduct = getProductById(id);
+
+        validateCategory(productDTO.categoryId());
 
         productMapper.updateEntity(existingProduct, productDTO);
 
@@ -61,5 +70,25 @@ public class ProductService implements IProductService {
         Product product = getProductById(id);
 
         productRepository.delete(product);
+    }
+
+    private void validateCategory(String categoryId) {
+
+        if (categoryId == null || categoryId.isBlank()) {
+            throw new IllegalArgumentException("יש לבחור קטגוריה למוצר");
+        }
+
+        if (!categoryRepository.existsById(categoryId)) {
+            throw new ResourceNotFoundException("הקטגוריה לא נמצאה");
+        }
+    }
+    @Override
+    public List<Product> getProductsByCategory(String categoryId) {
+
+        if (!categoryRepository.existsById(categoryId)) {
+            throw new ResourceNotFoundException("הקטגוריה לא נמצאה");
+        }
+
+        return productRepository.findByCategoryId(categoryId);
     }
 }

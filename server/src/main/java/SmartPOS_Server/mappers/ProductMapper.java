@@ -1,3 +1,4 @@
+
 package SmartPOS_Server.mappers;
 
 import SmartPOS_Server.dtos.GemstoneDTO;
@@ -20,7 +21,7 @@ public class ProductMapper {
 
         product.setName(dto.name());
         product.setDescription(dto.description());
-        product.setCategory(dto.category());
+        product.setCategoryId(dto.categoryId());
         product.setMetalType(dto.metalType());
         product.setPurity(dto.purity());
         product.setWeightGrams(dto.weightGrams());
@@ -39,7 +40,7 @@ public class ProductMapper {
 
         product.setName(dto.name());
         product.setDescription(dto.description());
-        product.setCategory(dto.category());
+        product.setCategoryId(dto.categoryId());
         product.setMetalType(dto.metalType());
         product.setPurity(dto.purity());
         product.setWeightGrams(dto.weightGrams());
