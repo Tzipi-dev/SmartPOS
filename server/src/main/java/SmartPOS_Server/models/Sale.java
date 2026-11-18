@@ -28,13 +28,38 @@ public class Sale {
     private String paymentStatus;
 
     private LocalDateTime createdAt;
+    private String saleStatus = "COMPLETED";
+    private String cancellationReason;
+    private LocalDateTime cancelledAt;
 
     public Sale() {
         this.createdAt = LocalDateTime.now();
     }
 
     // Getters and Setters
+    public String getSaleStatus() {
+        return saleStatus;
+    }
 
+    public void setSaleStatus(String saleStatus) {
+        this.saleStatus = saleStatus;
+    }
+
+    public String getCancellationReason() {
+        return cancellationReason;
+    }
+
+    public void setCancellationReason(String cancellationReason) {
+        this.cancellationReason = cancellationReason;
+    }
+
+    public LocalDateTime getCancelledAt() {
+        return cancelledAt;
+    }
+
+    public void setCancelledAt(LocalDateTime cancelledAt) {
+        this.cancelledAt = cancelledAt;
+    }
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 

@@ -48,4 +48,13 @@ public class SaleController {
                 .status(HttpStatus.CREATED)
                 .body(saleService.createSale(dto));
     }
+    @PutMapping("/{id}/cancel")
+    public ResponseEntity<Sale> cancelSale(
+            @PathVariable String id,
+            @RequestParam(required = false) String reason) {
+
+        return ResponseEntity.ok(
+                saleService.cancelSale(id, reason)
+        );
+    }
 }

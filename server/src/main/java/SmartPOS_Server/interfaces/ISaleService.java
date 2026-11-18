@@ -15,4 +15,6 @@ public interface ISaleService {
 
     Sale createSale(SaleRequestDTO dto);
 
+    Sale cancelSale(String saleId, String reason);
+
 }

@@ -5,17 +5,15 @@ import SmartPOS_Server.dtos.SaleRequestDTO;
 import SmartPOS_Server.dtos.SaleItemDTO;
 import SmartPOS_Server.interfaces.ISaleService;
 import SmartPOS_Server.models.*;
-import SmartPOS_Server.repositories.SaleRepository;
-import SmartPOS_Server.repositories.ProductRepository;
-import SmartPOS_Server.repositories.CustomerRepository;
-import SmartPOS_Server.repositories.InventoryMovementRepository;
+import SmartPOS_Server.repositories.*;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
-
+import SmartPOS_Server.repositories.SaleReturnRepository;
+import java.time.LocalDateTime;
 @Service
 public class SaleService implements ISaleService {
 
@@ -23,19 +21,138 @@ public class SaleService implements ISaleService {
     private final ProductRepository productRepository;
     private final CustomerRepository customerRepository;
     private final InventoryMovementRepository inventoryRepository;
+    private final SaleReturnRepository saleReturnRepository;
 
     public SaleService(
             SaleRepository saleRepository,
             ProductRepository productRepository,
             CustomerRepository customerRepository,
-            InventoryMovementRepository inventoryRepository) {
-
+            InventoryMovementRepository inventoryRepository,
+            SaleReturnRepository saleReturnRepository) {
+        this.saleReturnRepository = saleReturnRepository;
         this.saleRepository = saleRepository;
         this.productRepository = productRepository;
         this.customerRepository = customerRepository;
         this.inventoryRepository = inventoryRepository;
     }
 
+    @Override
+    @Transactional
+    public Sale cancelSale(String saleId, String reason) {
+
+        Sale sale = saleRepository.findById(saleId)
+                .orElseThrow(() ->
+                        new RuntimeException("המכירה לא נמצאה"));
+
+        if ("CANCELLED".equals(sale.getSaleStatus())) {
+            throw new IllegalArgumentException(
+                    "המכירה כבר בוטלה"
+            );
+        }
+
+        // חישוב הכמויות שכבר הוחזרו
+        Map<String, Integer> returnedQuantities = new HashMap<>();
+
+        List<SaleReturn> previousReturns =
+                saleReturnRepository.findBySaleId(saleId);
+
+        for (SaleReturn previousReturn : previousReturns) {
+
+            if (previousReturn.getItems() == null) {
+                continue;
+            }
+
+            for (SaleReturnItem item : previousReturn.getItems()) {
+
+                String key = item.getProductId() + "::" + item.getSku();
+
+                returnedQuantities.merge(
+                        key,
+                        item.getQuantity(),
+                        Integer::sum
+                );
+            }
+        }
+
+        // איסוף הכמויות שנמכרו
+        Map<String, Integer> soldQuantities = new HashMap<>();
+        Map<String, String> productIds = new HashMap<>();
+
+        for (SaleItem item : sale.getItems()) {
+
+            String key = item.getProductId() + "::" + item.getSku();
+
+            soldQuantities.merge(
+                    key,
+                    item.getQuantity(),
+                    Integer::sum
+            );
+
+            productIds.put(key, item.getProductId());
+        }
+
+        // החזרת הכמות שנותרה אצל הלקוח למלאי
+        Map<String, Product> products = new HashMap<>();
+
+        for (Map.Entry<String, Integer> entry : soldQuantities.entrySet()) {
+
+            String key = entry.getKey();
+
+            int sold = entry.getValue();
+            int returned = returnedQuantities.getOrDefault(key, 0);
+
+            if (returned > sold) {
+                throw new IllegalStateException(
+                        "כמות ההחזרות גדולה מהכמות שנמכרה"
+                );
+            }
+
+            int remaining = sold - returned;
+
+            if (remaining == 0) {
+                continue;
+            }
+
+            String productId = productIds.get(key);
+            String sku = key.substring(key.indexOf("::") + 2);
+
+            Product product = products.computeIfAbsent(
+                    productId,
+                    id -> productRepository.findById(id)
+                            .orElseThrow(() ->
+                                    new RuntimeException("המוצר לא נמצא"))
+            );
+
+            ProductVariant variant = product.getVariants().stream()
+                    .filter(v -> v.getSku().equals(sku))
+                    .findFirst()
+                    .orElseThrow(() ->
+                            new RuntimeException("וריאנט המוצר לא נמצא"));
+
+            variant.setQuantity(variant.getQuantity() + remaining);
+
+            InventoryMovement movement = new InventoryMovement();
+            movement.setProductId(productId);
+            movement.setSku(sku);
+            movement.setMovementType("IN");
+            movement.setQuantity(remaining);
+            movement.setReason("ביטול מכירה מספר " + saleId);
+
+            inventoryRepository.save(movement);
+        }
+
+        // שמירת המלאי המעודכן
+        for (Product product : products.values()) {
+            productRepository.save(product);
+        }
+
+        // עדכון סטטוס המכירה
+        sale.setSaleStatus("CANCELLED");
+        sale.setCancellationReason(reason);
+        sale.setCancelledAt(LocalDateTime.now());
+
+        return saleRepository.save(sale);
+    }
     @Override
     public List<Sale> getAllSales() {
         return saleRepository.findAll();
