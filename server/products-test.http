@@ -1,0 +1,17 @@
+### הוספת מוצר חדש
+POST http://localhost:8080/api/products
+Content-Type: application/json
+
+{
+  "name": "טבעת זהב",
+  "description": "טבעת זהב אלגנטית",
+  "metalType": "Gold",
+  "purity": "14K",
+  "weight": 3.5,
+  "purchasePrice": 800,
+  "sellingPrice": 1200,
+  "quantity": 5
+}
+
+### הצגת כל המוצרים
+GET http://localhost:8080/api/products
