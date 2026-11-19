@@ -11,6 +11,7 @@ public class SaleReturnItem {
     private int quantity;
     private BigDecimal unitPrice;
     private BigDecimal totalPrice;
+    private BigDecimal purchasePriceAtReturn;
 
     public String getProductId() {
         return productId;
@@ -58,5 +59,13 @@ public class SaleReturnItem {
 
     public void setTotalPrice(BigDecimal totalPrice) {
         this.totalPrice = totalPrice;
+    }
+
+    public BigDecimal getPurchasePriceAtReturn() {
+        return purchasePriceAtReturn;
+    }
+
+    public void setPurchasePriceAtReturn(BigDecimal purchasePriceAtReturn) {
+        this.purchasePriceAtReturn = purchasePriceAtReturn;
     }
 }

@@ -220,7 +220,13 @@ public class SaleService implements ISaleService {
             );
 
             BigDecimal unitPrice = variant.getSellingPrice();
+            BigDecimal purchasePrice = variant.getPurchasePrice();
 
+            if (purchasePrice == null) {
+                throw new IllegalArgumentException(
+                        "לא הוגדר מחיר רכישה עבור מק״ט: " + variant.getSku()
+                );
+            }
             BigDecimal itemTotal = unitPrice.multiply(
                     BigDecimal.valueOf(itemDTO.quantity())
             );
@@ -231,6 +237,7 @@ public class SaleService implements ISaleService {
             saleItem.setSku(variant.getSku());
             saleItem.setQuantity(itemDTO.quantity());
             saleItem.setUnitPrice(unitPrice);
+            saleItem.setPurchasePriceAtSale(purchasePrice);
             saleItem.setTotalPrice(itemTotal);
 
             saleItems.add(saleItem);

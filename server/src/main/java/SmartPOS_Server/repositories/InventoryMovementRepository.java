@@ -1,8 +1,10 @@
+
 package SmartPOS_Server.repositories;
 
 import SmartPOS_Server.models.InventoryMovement;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface InventoryMovementRepository
@@ -13,4 +15,9 @@ public interface InventoryMovementRepository
     List<InventoryMovement> findBySku(String sku);
 
     List<InventoryMovement> findByMovementType(String movementType);
+
+    List<InventoryMovement> findByCreatedAtBetween(
+            LocalDateTime startDate,
+            LocalDateTime endDate
+    );
 }

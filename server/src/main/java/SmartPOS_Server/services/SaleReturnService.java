@@ -146,7 +146,27 @@ public class SaleReturnService implements ISaleReturnService {
 
             int soldQuantity = 0;
             BigDecimal originalTotal = BigDecimal.ZERO;
+            BigDecimal originalCostTotal = BigDecimal.ZERO;
+            boolean hasCompleteCostData = true;
+
             String productName = originalItems.get(0).getProductName();
+
+            for (SaleItem originalItem : originalItems) {
+                soldQuantity += originalItem.getQuantity();
+
+                originalTotal = originalTotal.add(
+                        originalItem.getTotalPrice()
+                );
+
+                if (originalItem.getPurchasePriceAtSale() == null) {
+                    hasCompleteCostData = false;
+                } else {
+                    originalCostTotal = originalCostTotal.add(
+                            originalItem.getPurchasePriceAtSale()
+                                    .multiply(BigDecimal.valueOf(originalItem.getQuantity()))
+                    );
+                }
+            }
 
             for (SaleItem originalItem : originalItems) {
                 soldQuantity += originalItem.getQuantity();
@@ -216,6 +236,17 @@ public class SaleReturnService implements ISaleReturnService {
             );
 
             returnItem.setUnitPrice(effectiveUnitPrice);
+
+// שמירת עלות הרכישה ההיסטורית של הפריט שהוחזר
+            if (hasCompleteCostData) {
+                BigDecimal purchasePriceAtReturn = originalCostTotal.divide(
+                        BigDecimal.valueOf(soldQuantity),
+                        6,
+                        RoundingMode.HALF_UP
+                );
+
+                returnItem.setPurchasePriceAtReturn(purchasePriceAtReturn);
+            }
 
             returnItems.add(returnItem);
         }

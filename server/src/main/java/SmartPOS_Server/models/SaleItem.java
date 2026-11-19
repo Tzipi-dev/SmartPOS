@@ -10,6 +10,7 @@ public class SaleItem {
     private String sku;
     private int quantity;
     private BigDecimal unitPrice;
+    private BigDecimal purchasePriceAtSale;
     private BigDecimal totalPrice;
 
     public SaleItem() {}
@@ -52,6 +53,14 @@ public class SaleItem {
 
     public void setUnitPrice(BigDecimal unitPrice) {
         this.unitPrice = unitPrice;
+    }
+
+    public BigDecimal getPurchasePriceAtSale() {
+        return purchasePriceAtSale;
+    }
+
+    public void setPurchasePriceAtSale(BigDecimal purchasePriceAtSale) {
+        this.purchasePriceAtSale = purchasePriceAtSale;
     }
 
     public BigDecimal getTotalPrice() {

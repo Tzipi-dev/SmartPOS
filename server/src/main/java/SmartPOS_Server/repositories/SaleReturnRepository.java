@@ -10,4 +10,7 @@ public interface SaleReturnRepository
         extends MongoRepository<SaleReturn, String> {
 
     List<SaleReturn> findBySaleId(String saleId);
+
+    // כל ההחזרות עבור מספר מכירות
+    List<SaleReturn> findBySaleIdIn(List<String> saleIds);
 }
